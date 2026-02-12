@@ -42,3 +42,6 @@ The system demonstrates a complete clinical workflow:
 2. Actions are routed to appropriate departments
 3. Departments process and update status in real-time
 4. All stakeholders see immediate updates in patient timeline
+## License
+
+This project is provided for educational purposes to demonstrate healthcare workflow systems and web development technologies.
