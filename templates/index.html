@@ -40,56 +40,9 @@
             display: none;
         }
         
-        .status-pending {
-            background-color: #fef3c7;
-            color: #92400e;
-            border-color: #fbbf24;
-        }
-        
-        .status-in-progress {
-            background-color: #dbeafe;
-            color: #1e40af;
-            border-color: #60a5fa;
-        }
-        
-        .status-completed {
-            background-color: #d1fae5;
-            color: #065f46;
-            border-color: #34d399;
-        }
-        
-        .status-cancelled {
-            background-color: #fee2e2;
-            color: #991b1b;
-            border-color: #f87171;
-        }
-        
-        .priority-high {
-            border-left: 4px solid #ef4444;
-        }
-        
-        .priority-medium {
-            border-left: 4px solid #f59e0b;
-        }
-        
-        .priority-low {
-            border-left: 4px solid #10b981;
-        }
-        
-        .slide-in {
-            animation: slideIn 0.3s ease-out;
-        }
-        
-        @keyframes slideIn {
-            from {
-                transform: translateX(-100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
+        .status-pending { background: #fef3c7; border-left: 4px solid #f59e0b; }
+        .status-in-progress { background: #dbeafe; border-left: 4px solid #3b82f6; }
+        .status-completed { background: #d1fae5; border-left: 4px solid #10b981; }
         
         .tab-content {
             display: none;
@@ -98,269 +51,461 @@
         .tab-content.active {
             display: block;
         }
-        
-        .patient-card {
-            transition: all 0.2s ease;
-        }
-        
-        .patient-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        .action-card {
-            transition: all 0.2s ease;
-        }
-        
-        .action-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
     </style>
 </head>
 <body class="bg-gray-50">
-    <div class="min-h-screen p-6">
-        <div class="max-w-7xl mx-auto">
-            <!-- Header -->
-            <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">
-                    Patient-Centric Clinical Workflow
-                </h1>
-                <p class="text-gray-600">
-                    Real-time coordination and visibility for patient care
-                </p>
-            </div>
-
-            <!-- Navigation Tabs -->
-            <div class="bg-white rounded-lg shadow-sm mb-6">
-                <div class="border-b border-gray-200">
-                    <nav class="flex space-x-8 px-6" aria-label="Tabs">
-                        <button onclick="switchTab('patients')" class="tab-btn py-4 px-1 border-b-2 font-medium text-sm border-blue-500 text-blue-600" data-tab="patients">
-                            <i class="fas fa-users mr-2"></i>Patients
-                        </button>
-                        <button onclick="switchTab('timeline')" class="tab-btn py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-tab="timeline">
-                            <i class="fas fa-clock mr-2"></i>Timeline
-                        </button>
-                        <button onclick="switchTab('actions')" class="tab-btn py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-tab="actions">
-                            <i class="fas fa-file-medical mr-2"></i>Actions
-                        </button>
-                        <button onclick="switchTab('departments')" class="tab-btn py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-tab="departments">
-                            <i class="fas fa-hospital mr-2"></i>Departments
-                        </button>
-                    </nav>
+    <!-- Header with User Info -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-hospital text-blue-600 text-2xl mr-3"></i>
+                    <h1 class="text-xl font-bold text-gray-900">Clinical Workflow System</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm text-gray-600">
+                        <span class="font-medium" id="user-name">Loading...</span>
+                        <span class="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs" id="user-role">...</span>
+                    </div>
+                    <a href="/logout" class="text-red-600 hover:text-red-800 text-sm font-medium">
+                        <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                    </a>
                 </div>
             </div>
-
-            <!-- Patients Tab -->
-            <div id="patients-tab" class="tab-content active">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Patient List -->
-                    <div class="lg:col-span-1">
-                        <div class="bg-white rounded-lg shadow-sm">
-                            <div class="px-6 py-4 border-b border-gray-200">
-                                <h2 class="text-lg font-medium text-gray-900">
-                                    <i class="fas fa-user-injured mr-2"></i>Patients
-                                </h2>
-                            </div>
-                            <div class="p-6">
-                                <div id="patient-list" class="space-y-3">
-                                    <!-- Patients will be loaded here -->
-                                </div>
-                            </div>
+        </div>
+    </header>
+    
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Tab Navigation -->
+        <div class="mb-8">
+            <nav class="flex space-x-8" aria-label="Tabs">
+                <button onclick="showTab('overview')" class="tab-btn px-3 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600" data-tab="overview">
+                    <i class="fas fa-dashboard mr-2"></i>Overview
+                </button>
+                <button onclick="showTab('patients')" class="tab-btn px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent" data-tab="patients">
+                    <i class="fas fa-users mr-2"></i>Patients
+                </button>
+                <button onclick="showTab('actions')" class="tab-btn px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent" data-tab="actions">
+                    <i class="fas fa-tasks mr-2"></i>Clinical Actions
+                </button>
+                <button onclick="showTab('timeline')" class="tab-btn px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent" data-tab="timeline">
+                    <i class="fas fa-clock mr-2"></i>Timeline
+                </button>
+            </nav>
+        </div>
+        
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-blue-100 rounded-full">
+                            <i class="fas fa-users text-blue-600"></i>
                         </div>
-                    </div>
-
-                    <!-- Patient Details -->
-                    <div class="lg:col-span-2">
-                        <div id="patient-details" class="bg-white rounded-lg shadow-sm">
-                            <div class="p-6 text-center text-gray-500">
-                                Select a patient to view details
-                            </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Total Patients</p>
+                            <p class="text-2xl font-bold text-gray-900" id="total-patients">0</p>
                         </div>
                     </div>
                 </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-green-100 rounded-full">
+                            <i class="fas fa-tasks text-green-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Active Actions</p>
+                            <p class="text-2xl font-bold text-gray-900" id="active-actions">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-yellow-100 rounded-full">
+                            <i class="fas fa-clock text-yellow-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Pending Tasks</p>
+                            <p class="text-2xl font-bold text-gray-900" id="pending-tasks">0</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <!-- Timeline Tab -->
-            <div id="timeline-tab" class="tab-content">
-                <div id="timeline-content" class="bg-white rounded-lg shadow-sm">
-                    <div class="p-6 text-center text-gray-500">
+        </div>
+        
+        <!-- Patients Tab -->
+        <div id="patients" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Add Patient Form -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Add New Patient</h2>
+                        <form id="patient-form" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Name</label>
+                                <input type="text" id="name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Age</label>
+                                <input type="number" id="age" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Gender</label>
+                                <select id="gender" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="">Select</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Condition</label>
+                                <input type="text" id="condition" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
+                                Add Patient
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Patients List -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Patients</h2>
+                        <div id="patients-list" class="space-y-4">
+                            <!-- Patients will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Clinical Actions Tab -->
+        <div id="actions" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Create Action Form -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Create Clinical Action</h2>
+                        <form id="action-form" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Patient</label>
+                                <select id="patient-select" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="">Select Patient</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Action Type</label>
+                                <select id="action-type" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="">Select Type</option>
+                                    <option value="prescription">Prescription</option>
+                                    <option value="diagnostic">Diagnostic</option>
+                                    <option value="referral">Referral</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Title</label>
+                                <input type="text" id="action-title" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Description</label>
+                                <textarea id="action-description" required rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Assigned To</label>
+                                <select id="assigned-to" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="">Select Department</option>
+                                    <option value="Pharmacy">Pharmacy</option>
+                                    <option value="Diagnostics">Diagnostics</option>
+                                    <option value="Nursing">Nursing</option>
+                                    <option value="Radiology">Radiology</option>
+                                    <option value="Laboratory">Laboratory</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700">
+                                Create Action
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Actions List -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Clinical Actions</h2>
+                        <div id="actions-list" class="space-y-4">
+                            <!-- Actions will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Timeline Tab -->
+        <div id="timeline" class="tab-content">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Patient Timeline</h2>
+                <div id="timeline-list" class="space-y-4">
+                    <div class="text-center text-gray-500">
                         Select a patient to view their care timeline
                     </div>
                 </div>
             </div>
+        </div>
+    </main>
 
-            <!-- Actions Tab -->
-            <div id="actions-tab" class="tab-content">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Add Patient Form -->
-                    <div class="bg-white rounded-lg shadow-sm">
-                        <div class="px-6 py-4 border-b border-gray-200">
-                            <h2 class="text-lg font-medium text-gray-900">
-                                <i class="fas fa-user-plus mr-2"></i>Add New Patient
-                            </h2>
+    <script>
+        let currentUser = null;
+        let patients = [];
+        let actions = [];
+        
+        // Load user info
+        async function loadUserInfo() {
+            try {
+                const response = await fetch('/api/user');
+                if (response.ok) {
+                    currentUser = await response.json();
+                    document.getElementById('user-name').textContent = currentUser.name;
+                    document.getElementById('user-role').textContent = currentUser.role;
+                    
+                    // Show/hide features based on role
+                    updateUIForRole(currentUser.role);
+                }
+            } catch (error) {
+                console.error('Error loading user info:', error);
+            }
+        }
+        
+        // Update UI based on user role
+        function updateUIForRole(role) {
+            const patientForm = document.getElementById('patient-form');
+            const actionForm = document.getElementById('action-form');
+            
+            // Hide forms by default
+            if (patientForm) patientForm.style.display = 'none';
+            if (actionForm) actionForm.style.display = 'none';
+            
+            // Show forms based on role permissions
+            switch(role) {
+                case 'admin':
+                case 'doctor':
+                    if (patientForm) patientForm.style.display = 'block';
+                    if (actionForm) actionForm.style.display = 'block';
+                    break;
+                case 'nurse':
+                    if (actionForm) actionForm.style.display = 'block';
+                    break;
+                case 'pharmacy':
+                case 'diagnostics':
+                    // These roles can only see assigned actions
+                    if (actionForm) actionForm.style.display = 'none';
+                    break;
+            }
+        }
+        
+        // Tab switching
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active state from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('text-blue-600', 'border-blue-600');
+                btn.classList.add('text-gray-500', 'border-transparent');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active state to clicked button
+            const activeBtn = document.querySelector(`[data-tab="${tabName}"]`);
+            activeBtn.classList.remove('text-gray-500', 'border-transparent');
+            activeBtn.classList.add('text-blue-600', 'border-blue-600');
+        }
+        
+        // Load data
+        async function loadData() {
+            try {
+                const [patientsRes, actionsRes] = await Promise.all([
+                    fetch('/api/patients'),
+                    fetch('/api/clinical-actions')
+                ]);
+                
+                patients = await patientsRes.json();
+                actions = await actionsRes.json();
+                
+                updateUI();
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+        
+        // Update UI
+        function updateUI() {
+            updateOverview();
+            updatePatientsList();
+            updateActionsList();
+            updatePatientSelect();
+        }
+        
+        // Update overview stats
+        function updateOverview() {
+            document.getElementById('total-patients').textContent = patients.length;
+            document.getElementById('active-actions').textContent = actions.filter(a => a.status !== 'completed').length;
+            document.getElementById('pending-tasks').textContent = actions.filter(a => a.status === 'pending').length;
+        }
+        
+        // Update patients list
+        function updatePatientsList() {
+            const list = document.getElementById('patients-list');
+            list.innerHTML = patients.map(patient => `
+                <div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-semibold text-gray-900">${patient.name}</h3>
+                            <p class="text-sm text-gray-600">${patient.age} years, ${patient.gender}</p>
+                            <p class="text-sm text-gray-500">${patient.condition}</p>
                         </div>
-                        <div class="p-6">
-                            <form id="patient-form" class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Patient Name *</label>
-                                    <input type="text" id="patient-name" required placeholder="e.g., John Doe" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Age *</label>
-                                        <input type="number" id="patient-age" required placeholder="45" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Gender *</label>
-                                        <select id="patient-gender" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                            <option value="">Select</option>
-                                            <option value="Male">Male</option>
-                                            <option value="Female">Female</option>
-                                            <option value="Other">Other</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Blood Group</label>
-                                        <select id="patient-blood" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                            <option value="A+">A+</option>
-                                            <option value="A-">A-</option>
-                                            <option value="B+">B+</option>
-                                            <option value="B-">B-</option>
-                                            <option value="O+">O+</option>
-                                            <option value="O-">O-</option>
-                                            <option value="AB+">AB+</option>
-                                            <option value="AB-">AB-</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                        <select id="patient-status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                            <option value="admitted">Admitted</option>
-                                            <option value="discharged">Discharged</option>
-                                            <option value="critical">Critical</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Condition *</label>
-                                    <input type="text" id="patient-condition" required placeholder="e.g., Chest Pain" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                </div>
-                                <button type="submit" class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
-                                    <i class="fas fa-user-plus mr-2"></i>Add Patient
-                                </button>
-                            </form>
-                        </div>
+                        <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                            ${patient.status}
+                        </span>
                     </div>
-
-                    <!-- Create Action Form -->
-                    <div class="bg-white rounded-lg shadow-sm">
-                        <div class="px-6 py-4 border-b border-gray-200">
-                            <h2 class="text-lg font-medium text-gray-900">
-                                <i class="fas fa-plus-circle mr-2"></i>Create Clinical Action
-                            </h2>
-                        </div>
-                        <div class="p-6">
-                            <form id="action-form" class="space-y-4">
-                                <!-- Patient Selection -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Patient *</label>
-                                    <select id="action-patient" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <option value="">Select a patient</option>
+                </div>
+            `).join('');
+        }
+        
+        // Update actions list
+        function updateActionsList() {
+            const list = document.getElementById('actions-list');
+            list.innerHTML = actions.map(action => {
+                const patient = patients.find(p => p.id === action.patientId);
+                const canUpdate = currentUser.role === 'admin' || 
+                               currentUser.role === 'nurse' || 
+                               (currentUser.role === action.assignedTo.toLowerCase());
+                
+                return `
+                    <div class="border rounded-lg p-4 hover:shadow-md transition-shadow status-${action.status}">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-semibold text-gray-900">${action.title}</h3>
+                                <p class="text-sm text-gray-600">${action.type}</p>
+                                <p class="text-sm text-gray-500">Patient: ${patient ? patient.name : 'Unknown'}</p>
+                                <p class="text-sm text-gray-500">Assigned to: ${action.assignedTo}</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
+                                    ${action.status}
+                                </span>
+                                ${canUpdate ? `
+                                    <select onchange="updateActionStatus('${action.id}', this.value)" 
+                                            class="text-xs border rounded px-2 py-1">
+                                        <option value="pending" ${action.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                        <option value="in-progress" ${action.status === 'in-progress' ? 'selected' : ''}>In Progress</option>
+                                        <option value="completed" ${action.status === 'completed' ? 'selected' : ''}>Completed</option>
                                     </select>
-                                </div>
-
-                                <!-- Action Type -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Action Type *</label>
-                                    <select id="action-type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <option value="prescription">Prescription</option>
-                                        <option value="diagnostic">Diagnostic Request</option>
-                                        <option value="referral">Referral</option>
-                                        <option value="care-instruction">Care Instruction</option>
-                                        <option value="lab-test">Lab Test</option>
-                                        <option value="imaging">Imaging Request</option>
-                                    </select>
-                                </div>
-
-                                <!-- Title -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Title *</label>
-                                    <input type="text" id="action-title" required placeholder="e.g., Prescribe pain medication" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                </div>
-
-                                <!-- Description -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Description *</label>
-                                    <textarea id="action-description" required rows="3" placeholder="Detailed description of the clinical action..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                                </div>
-
-                                <!-- Priority -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-                                    <div class="flex gap-3">
-                                        <label class="flex items-center">
-                                            <input type="radio" name="priority" value="low" class="mr-2">
-                                            <span class="text-sm">Low</span>
-                                        </label>
-                                        <label class="flex items-center">
-                                            <input type="radio" name="priority" value="medium" checked class="mr-2">
-                                            <span class="text-sm">Medium</span>
-                                        </label>
-                                        <label class="flex items-center">
-                                            <input type="radio" name="priority" value="high" class="mr-2">
-                                            <span class="text-sm">High</span>
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <!-- Assigned To -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Assigned To</label>
-                                    <select id="action-department" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <option value="Pharmacy">Pharmacy</option>
-                                        <option value="Diagnostics">Diagnostics</option>
-                                        <option value="Nursing">Nursing</option>
-                                        <option value="Referrals">Referrals</option>
-                                        <option value="Laboratory">Laboratory</option>
-                                        <option value="Radiology">Radiology</option>
-                                    </select>
-                                </div>
-
-                                <!-- Submit Button -->
-                                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <i class="fas fa-file-medical mr-2"></i>Create Clinical Action
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Recent Actions -->
-                    <div class="bg-white rounded-lg shadow-sm">
-                        <div class="px-6 py-4 border-b border-gray-200">
-                            <h2 class="text-lg font-medium text-gray-900">
-                                <i class="fas fa-history mr-2"></i>Recent Actions
-                            </h2>
-                        </div>
-                        <div class="p-6">
-                            <div id="recent-actions" class="space-y-4">
-                                <!-- Recent actions will be loaded here -->
+                                ` : ''}
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Departments Tab -->
-            <div id="departments-tab" class="tab-content">
-                <div id="departments-content" class="space-y-6">
-                    <!-- Department content will be loaded here -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="/static/js/app.js"></script>
+                `;
+            }).join('');
+        }
+        
+        // Update action status
+        async function updateActionStatus(actionId, newStatus) {
+            try {
+                const response = await fetch(`/api/clinical-actions/${actionId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                
+                if (response.ok) {
+                    loadData();
+                } else {
+                    const error = await response.json();
+                    alert(error.error || 'Failed to update status');
+                }
+            } catch (error) {
+                console.error('Error updating action status:', error);
+                alert('Failed to update status');
+            }
+        }
+        
+        // Update patient select dropdown
+        function updatePatientSelect() {
+            const select = document.getElementById('patient-select');
+            select.innerHTML = '<option value="">Select Patient</option>' + 
+                patients.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+        }
+        
+        // Handle patient form submission
+        document.getElementById('patient-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const data = {
+                name: document.getElementById('name').value,
+                age: parseInt(document.getElementById('age').value),
+                gender: document.getElementById('gender').value,
+                condition: document.getElementById('condition').value
+            };
+            
+            try {
+                const response = await fetch('/api/patients', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    e.target.reset();
+                    loadData();
+                }
+            } catch (error) {
+                console.error('Error creating patient:', error);
+            }
+        });
+        
+        // Handle action form submission
+        document.getElementById('action-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const data = {
+                patientId: document.getElementById('patient-select').value,
+                type: document.getElementById('action-type').value,
+                title: document.getElementById('action-title').value,
+                description: document.getElementById('action-description').value,
+                assignedTo: document.getElementById('assigned-to').value,
+                initiatedBy: currentUser.name,
+                initiatedByDepartment: currentUser.role
+            };
+            
+            try {
+                const response = await fetch('/api/clinical-actions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    e.target.reset();
+                    loadData();
+                }
+            } catch (error) {
+                console.error('Error creating action:', error);
+            }
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserInfo();
+            loadData();
+        });
+    </script>
 </body>
 </html>
